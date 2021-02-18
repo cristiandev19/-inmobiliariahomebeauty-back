@@ -1,11 +1,9 @@
-const passport = require('passport');
-const User = require("../../models/User");
-const auth_utils = require('./auth.utils');
+const authUtils = require('./auth.utils');
+const User = require('../../models/User');
 // const
 
 exports.emailLogin = async (req, res, next) => {
   try {
-    console.log('res', req.body);
     const { email, password } = req.body;
     const [user] = await User.find({ email });
 
@@ -13,51 +11,61 @@ exports.emailLogin = async (req, res, next) => {
       throw new Error('El usuario no existe');
     }
 
-    console.log('user', user);
-    const tokenObject = auth_utils.signToken(user);
+    const { err, isMatch, message } = await user.comparePassword(password);
+    // , (err, isMatch) => {
+    // });
+    if (err) {
+      throw new Error(message);
+    }
+    if (!isMatch) {
+      throw new Error(message);
+    }
+
+    const tokenObject = authUtils.signToken(user);
     const { names, lastNames } = user;
     const userObj = {
       names,
       lastNames,
-      email
+      email,
     };
-
     return res.status(200).json({
       success   : true,
       user      : userObj,
       token     : tokenObject.token,
-      expiresIn : tokenObject.expires
+      expiresIn : tokenObject.expires,
     });
   } catch (error) {
     return next(error);
   }
-}
+};
 
 exports.emailSignup = (req, res, next) => {
   try {
-    const { names, lastNames, email, password } = req.body;
-    const user = new User({ names, lastNames, email, password });
+    const {
+      names, lastNames, email, password,
+    } = req.body;
+    const user = new User({
+      names, lastNames, email, password,
+    });
     user.save();
-    console.log('user', user)
     return res.status(200).send({
-      message: 'Funciono'
-    })
+      message: 'Funciono',
+    });
   } catch (error) {
     return next(error);
   }
-}
+};
 
 exports.protected = (req, res, next) => {
   try {
-
     // ahora tenemos el req.user  con la informacion del usuario
     return res.status(200).send({
-      message: 'Funciono estas autentificado'
-    })
+      message: 'Funciono estas autentificado',
+    });
   } catch (error) {
     return next(error);
   }
-}
+};
 
 // const userSchema = new mongoose.Schema({
 //   names              : String,
@@ -68,5 +76,3 @@ exports.protected = (req, res, next) => {
 //   passwordResetToken : String,
 //   emailVerified      : Boolean
 // }, { timestamps: true });
-
-

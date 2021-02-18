@@ -1,21 +1,21 @@
 const express = require('express');
+
 const router = express.Router();
 
 // //passport stuff
 const passport      = require('passport');
-
-
-const auth_controller = require('./auth.controller');
+const authController = require('./auth.controller');
 
 // middleware that is specific to this router
-router.use(function timeLog(req, res, next) {
+router.use((req, res, next) => {
+  // eslint-disable-next-line no-console
   console.log('Auth Time: ', Date.now());
   next();
 });
 
 router
-.post('/email-login', auth_controller.emailLogin)
-.post('/email-signup', auth_controller.emailSignup)
-.get('/protected', passport.authenticate('jwt', { session: false }), auth_controller.protected);
+  .post('/email-login', authController.emailLogin)
+  .post('/email-signup', authController.emailSignup)
+  .get('/protected', passport.authenticate('jwt', { session: false }), authController.protected);
 
 module.exports = router;

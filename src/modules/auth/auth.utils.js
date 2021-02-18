@@ -7,17 +7,15 @@ exports.signToken = (user, secret = config.jwtSecretKey) => {
   const expiresIn = config.authJwtExpireTime;
 
   const payload = {
-    sub: _id,
-    iat: Date.now(),
+    sub : _id,
+    iat : Date.now(),
   };
   const signedToken = jwt.sign(payload, secret, {
     expiresIn,
   });
-  // const expira = ms(expiresIn);
-  // console.log('expira', expira)
   return {
-    token: `Bearer ${signedToken}`,
-    expires: ms(expiresIn),
+    token   : `Bearer ${signedToken}`,
+    expires : ms(expiresIn),
   };
 };
 
@@ -25,9 +23,9 @@ exports.verifyToken = (token, secret = config.jwtSecretKey) => {
   try {
     const verified = jwt.verify(token, secret);
     return {
-      msj: 'Autentificado con exito',
-      payload: verified
-    }
+      msj     : 'Autentificado con exito',
+      payload : verified,
+    };
   } catch (error) {
     return {
       msj: error.message || 'Problemas al verificar el token',
@@ -35,4 +33,3 @@ exports.verifyToken = (token, secret = config.jwtSecretKey) => {
     };
   }
 };
-

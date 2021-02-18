@@ -1,15 +1,17 @@
 const express = require('express');
+
 const router = express.Router();
 
-const admin_controller = require('./admin.controller');
+const adminController = require('./admin.controller');
 
 // middleware that is specific to this router
-router.use(function timeLog(req, res, next) {
+router.use((req, res, next) => {
+  // eslint-disable-next-line no-console
   console.log('Time: ', Date.now());
   next();
 });
 
 router
-.post('/uploadFile', admin_controller.uploadFile);
+  .post('/uploadFile', adminController.uploadFile);
 
 module.exports = router;
