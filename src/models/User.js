@@ -8,9 +8,8 @@ const userSchema = new mongoose.Schema({
   password           : String,
   // Cuando quieres cambiar la contraseña, se usa el Token
   passwordResetToken : String,
-  emailVerified      : Boolean
+  emailVerified      : Boolean,
 }, { timestamps: true });
-
 
 /**
  * Password hash middleware.
@@ -22,27 +21,37 @@ userSchema.pre('save', function save(next) {
   if (!user.isModified('password')) { return next(); }
   bcrypt.genSalt(10, (err, salt) => {
     if (err) { return next(err); }
-    bcrypt.hash(user.password, salt, (err, hash) => {
-      if (err) { return next(err); }
+    bcrypt.hash(user.password, salt, (error, hash) => {
+      if (error) { return next(error); }
       user.password = hash;
-      next();
+      return next();
     });
+    return null;
   });
+  return null;
 });
-
 
 /**
  * Helper method for validating user's password.
  */
-userSchema.methods.comparePassword = function comparePassword(candidatePassword, cb) {
+
+// eslint-disable-next-line consistent-return
+userSchema.methods.comparePassword = (candidatePassword) => new Promise((resolve) => {
   // This es porque se aplica sobre el objeto que tienes;
   if (typeof this.password === 'undefined') {
-    cb(false, '');
+    return resolve({ error: true, message: 'Ingrese una contraseña.' });
   }
   bcrypt.compare(candidatePassword, this.password, (err, isMatch) => {
-    cb(err, isMatch);
+    if (err) {
+      return resolve({ error: true, message: 'Invalid email or password.' });
+    }
+    if (!isMatch) {
+      return resolve({ success: true, isMatch, message: 'Contraseña incorrecta.' });
+    }
+    return resolve({ success: true, isMatch, message: 'Contraseña correcta' });
   });
-};
+});
+
 /**
  * Como se aplica
 user.comparePassword(password, (err, isMatch) => {
@@ -57,4 +66,3 @@ user.comparePassword(password, (err, isMatch) => {
 const User = mongoose.model('User', userSchema);
 
 module.exports = User;
-
