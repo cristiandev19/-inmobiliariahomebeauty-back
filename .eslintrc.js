@@ -1,8 +1,8 @@
 module.exports = {
   env: {
-    commonjs: true,
-    es2021: true,
-    node: true,
+    commonjs : true,
+    es2021   : true,
+    node     : true,
   },
   extends: [
     'airbnb-base',
@@ -11,8 +11,16 @@ module.exports = {
     ecmaVersion: 12,
   },
   rules: {
-    'no-multi-spaces': ['error', { exceptions: { VariableDeclarator: true } }],
-    // no-multi-spaces: "error"
-    // "
+    'no-multi-spaces' : ['error', { exceptions: { VariableDeclarator: true } }],
+    'key-spacing'     : ['error', {
+      align: {
+        beforeColon : true,
+        afterColon  : true,
+        on          : 'colon',
+      },
+    }],
+    'consistent-return': ['off'],
+    // no-multi-spaces: 'error'
+    // '
   },
 };
