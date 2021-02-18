@@ -7,17 +7,14 @@ exports.uploadFile = async (req, res, next) => {
   try {
     const { extension, dataFile, fileName } = req.body;
 
-    const bufferObjectImg = await imagesUtilities.convertBase64ToBuffer({
+    const bufferObjectImg = await imagesUtilities.convertBase64ToBuffer(dataFile);
+    const uploadParams = {
+      bufferBody  : bufferObjectImg.buffer,
+      contentType : bufferObjectImg.contentType,
       fileName,
       extension,
-      bufferBody: bufferObjectImg.buffer,
-      contentType: bufferObjectImg.contentType
-    });
-
+    };
     const uploadedImg = await awsUtilities.s3UploadPromise(uploadParams);
-    console.log('uploaded', uploaded);
-
-    // const file = '../q.png';
     const { dataQR } = await qrUtilities.generateQRByUrl(uploadedImg.Location);
     const bufferObjectQR = await imagesUtilities.convertBase64ToBuffer(dataQR);
 
@@ -25,18 +22,20 @@ exports.uploadFile = async (req, res, next) => {
     const extensionQR = bufferObjectQR.type;
 
     const uploaded = await awsUtilities.s3UploadPromise({
-      fileName: fileNameQR,
-      extension: extensionQR,
-      bufferBody: bufferObjectQR.buffer,
-      contentType: bufferObjectQR.contentType
+      fileName    : fileNameQR,
+      extension   : extensionQR,
+      bufferBody  : bufferObjectQR.buffer,
+      contentType : bufferObjectQR.contentType,
     });
 
-    console.log('hola', req.body.extension);
+    if (!uploaded) {
+      throw new Error('No se pudo subir');
+    }
+
     return res.status(200).send({
-      message: 'Funciono'
-    })
+      message: 'Funciono',
+    });
   } catch (error) {
     next(error);
   }
 };
-
