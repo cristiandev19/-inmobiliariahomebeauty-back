@@ -11,10 +11,9 @@ exports.emailLogin = async (req, res, next) => {
       throw new Error('El usuario no existe');
     }
 
-    const { err, isMatch, message } = await user.comparePassword(password);
-    // , (err, isMatch) => {
-    // });
-    if (err) {
+    const { error, isMatch, message } = await user.comparePassword(password);
+
+    if (error) {
       throw new Error(message);
     }
     if (!isMatch) {
@@ -22,10 +21,9 @@ exports.emailLogin = async (req, res, next) => {
     }
 
     const tokenObject = authUtils.signToken(user);
-    const { names, lastNames } = user;
+    const { profile } = user;
     const userObj = {
-      names,
-      lastNames,
+      profile,
       email,
     };
     return res.status(200).json({
@@ -44,9 +42,12 @@ exports.emailSignup = (req, res, next) => {
     const {
       names, lastNames, email, password,
     } = req.body;
-    const user = new User({
-      names, lastNames, email, password,
-    });
+    const profile = {
+      names,
+      lastNames,
+    };
+    const user = new User({ email, password, profile });
+
     user.save();
     return res.status(200).send({
       message: 'Funciono',
