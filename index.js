@@ -1,4 +1,5 @@
 const express          = require('express');
+
 const app              = express();
 const cors             = require('cors');
 const bodyParser       = require('body-parser');
@@ -6,6 +7,7 @@ const bodyParser       = require('body-parser');
 // Passport stuff
 const passport     = require('passport');
 const jwtStrategy  = require('./src/strategies/jwt');
+
 passport.use(jwtStrategy);
 
 // Extra
@@ -26,7 +28,7 @@ app
 
 // Importamos modulos
 const adminRouter = require('./src/modules/admin/admin.router');
-const authRouter = require('./src/modules/auth/auth.router');
+const authRouter  = require('./src/modules/auth/auth.router');
 
 // Establecemos las rutas
 app
@@ -39,5 +41,6 @@ app
   .use(errorHandler);
 
 app.listen(config.port, () => {
+  // eslint-disable-next-line no-console
   console.log(`Example app listening at http://localhost:${config.port}`);
 });
