@@ -2,7 +2,7 @@ const jwt = require('jsonwebtoken');
 const ms = require('ms');
 const { config } = require('../../config/index');
 
-exports.signToken = (user, secret = config.jwtSecretKey) => {
+exports.signToken = (user, secret = config.authJwtSecret) => {
   const { _id } = user;
   const expiresIn = config.authJwtExpireTime;
 
@@ -19,7 +19,7 @@ exports.signToken = (user, secret = config.jwtSecretKey) => {
   };
 };
 
-exports.verifyToken = (token, secret = config.jwtSecretKey) => {
+exports.verifyToken = (token, secret = config.authJwtSecret) => {
   try {
     const verified = jwt.verify(token, secret);
     return {
