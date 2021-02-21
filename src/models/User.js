@@ -2,10 +2,13 @@ const bcrypt = require('bcrypt');
 const mongoose = require('mongoose');
 
 const userSchema = new mongoose.Schema({
-  names              : String,
-  lastNames          : String,
-  email              : { type: String, unique: true },
-  password           : String,
+  email    : { type: String, unique: true },
+  password : String,
+  profile  : {
+    names     : String,
+    lastNames : String,
+    picture   : { type: String, default: 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png' },
+  },
   // Cuando quieres cambiar la contraseña, se usa el Token
   passwordResetToken : String,
   emailVerified      : Boolean,
@@ -36,21 +39,24 @@ userSchema.pre('save', function save(next) {
  */
 
 // eslint-disable-next-line consistent-return
-userSchema.methods.comparePassword = (candidatePassword) => new Promise((resolve) => {
-  // This es porque se aplica sobre el objeto que tienes;
-  if (typeof this.password === 'undefined') {
-    return resolve({ error: true, message: 'Ingrese una contraseña.' });
-  }
-  bcrypt.compare(candidatePassword, this.password, (err, isMatch) => {
-    if (err) {
-      return resolve({ error: true, message: 'Invalid email or password.' });
+userSchema.methods.comparePassword = function comparePassword(candidatePassword) {
+  // eslint-disable-next-line no-new
+  return new Promise((resolve) => {
+    // This es porque se aplica sobre el objeto que tienes;
+    if (typeof this.password === 'undefined') {
+      return resolve({ error: true, message: 'Ingrese una contraseña.' });
     }
-    if (!isMatch) {
-      return resolve({ success: true, isMatch, message: 'Contraseña incorrecta.' });
-    }
-    return resolve({ success: true, isMatch, message: 'Contraseña correcta' });
+    bcrypt.compare(candidatePassword, this.password, (err, isMatch) => {
+      if (err) {
+        return resolve({ error: true, message: 'Invalid email or password.' });
+      }
+      if (!isMatch) {
+        return resolve({ error: true, isMatch, message: 'Contraseña incorrecta.' });
+      }
+      return resolve({ success: true, isMatch, message: 'Contraseña correcta' });
+    });
   });
-});
+} 
 
 /**
  * Como se aplica

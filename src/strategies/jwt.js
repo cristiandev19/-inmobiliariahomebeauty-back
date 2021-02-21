@@ -5,7 +5,7 @@ const User = require('../models/User');
 
 const opts = {
   jwtFromRequest : ExtractJwt.fromAuthHeaderAsBearerToken(),
-  secretOrKey    : config.jwtSecretKey, // normally store this in process.env.secret
+  secretOrKey    : config.authJwtSecret, // normally store this in process.env.secret
 };
 
 // Aqui debemos cambiarlo para que llame a la BD por un id dentro del token
