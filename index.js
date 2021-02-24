@@ -23,16 +23,18 @@ const { logErrors, errorHandler } = require('./src/middlewares/errorHandler');
 // Aqui configuraciones
 app
   .use(cors({ origin: '*' }))
-  .use(bodyParser.urlencoded({ limit: '5mb', extended: true }))
-  .use(bodyParser.json({ limit: '5mb' }));
+  .use(bodyParser.urlencoded({ parameterLimit: 100000, limit: '20mb', extended: true }))
+  .use(bodyParser.json({ limit: '20mb' }));
 
 // Importamos modulos
 const adminRouter = require('./src/modules/admin/admin.router');
 const authRouter  = require('./src/modules/auth/auth.router');
+const utilityRouter  = require('./src/modules/utility/utility.router');
 
 // Establecemos las rutas
 app
   .use('/admin', adminRouter)
+  .use('/utility', utilityRouter)
   .use('/auth', authRouter);
 
 // Middleware para manejo de errores
