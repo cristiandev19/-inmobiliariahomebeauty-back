@@ -39,3 +39,13 @@ exports.uploadFile = async (req, res, next) => {
     next(error);
   }
 };
+
+exports.createInmueble = (req, res, next) => {
+  try {
+    return res.status(200).send({
+      hola: 'has',
+    });
+  } catch (error) {
+    return next(error);
+  }
+};
