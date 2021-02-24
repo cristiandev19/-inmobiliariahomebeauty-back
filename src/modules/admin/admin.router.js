@@ -12,6 +12,7 @@ router.use((req, res, next) => {
 });
 
 router
-  .post('/uploadFile', adminController.uploadFile);
+  .post('/uploadFile', adminController.uploadFile)
+  .post('/create-inmueble', adminController.createInmueble);
 
 module.exports = router;
