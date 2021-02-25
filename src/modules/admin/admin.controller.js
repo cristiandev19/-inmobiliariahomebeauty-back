@@ -42,6 +42,10 @@ exports.uploadFile = async (req, res, next) => {
 
 exports.createInmueble = (req, res, next) => {
   try {
+    console.log('req', Object.keys(req.body));
+    console.log('req.multimedia', req.body.multimedia);
+    console.log('req.datosPrincipales', req.body.datosPrincipales);
+    console.log('req.caracteristicas', req.body.caracteristicas);
     return res.status(200).send({
       hola: 'has',
     });
