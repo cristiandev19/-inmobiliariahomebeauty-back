@@ -32,9 +32,10 @@ exports.uploadBase64ToS3 = (imgBase64, fileName = '') => new Promise(async (reso
   };
   const responseS3 = await awsUtilities.s3UploadPromise(uploadParams);
   return resolve({
-    url      : responseS3.Location,
-    fileName : responseS3.key,
-    bucket   : responseS3.Bucket,
+    url       : responseS3.Location,
+    fileName  : responseS3.key,
+    bucket    : responseS3.Bucket,
+    extension : bufferObjectImg.type,
   });
 });
 
