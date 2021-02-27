@@ -56,7 +56,7 @@ userSchema.methods.comparePassword = function comparePassword(candidatePassword)
       return resolve({ success: true, isMatch, message: 'Contraseña correcta' });
     });
   });
-} 
+};
 
 /**
  * Como se aplica
