@@ -2,6 +2,7 @@ const { config } = require('../../config/index');
 const imagesUtilities = require('../../utilities/images');
 const qrUtilities = require('../../utilities/qr');
 const awsUtilities = require('../../utilities/aws');
+const inmuebleService = require('../../services/inmueble');
 
 exports.uploadFile = async (req, res, next) => {
   try {
@@ -40,14 +41,36 @@ exports.uploadFile = async (req, res, next) => {
   }
 };
 
-exports.createInmueble = (req, res, next) => {
+exports.createInmueble = async (req, res, next) => {
   try {
-    console.log('req', Object.keys(req.body));
-    console.log('req.multimedia', req.body.multimedia);
-    console.log('req.datosPrincipales', req.body.datosPrincipales);
-    console.log('req.caracteristicas', req.body.caracteristicas);
+    console.log('req', req.user);
     return res.status(200).send({
-      hola: 'has',
+      message: 'Funciono estas autentificado',
+    });
+    const multimediaPromises = await Promise.all(
+      [...req.body.multimedia]
+        .map(async (multi) => imagesUtilities.uploadBase64ToS3(multi.imgBase64)),
+    );
+    const multimedia = multimediaPromises.map((m) => ({
+      urlMultimedia       : m.url,
+      extensionMultimedia : m.extension,
+    }));
+
+    const {
+      success, error, message, inmueble,
+    } = await inmuebleService.createInmueble({
+      datosPrincipales : req.body.datosPrincipales,
+      caracteristicas  : req.body.caracteristicas,
+      multimedia,
+    });
+
+    if (error) {
+      throw new Error(message);
+    }
+
+    return res.status(200).send({
+      success,
+      inmueble,
     });
   } catch (error) {
     return next(error);
