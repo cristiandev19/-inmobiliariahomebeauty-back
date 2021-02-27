@@ -1,4 +1,4 @@
-const { Schema, model } = require('mongoose');
+const { Schema, model, ObjectId } = require('mongoose');
 
 const CaracteristicasSchema = new Schema({
   servicios       : [Number],
@@ -8,33 +8,40 @@ const CaracteristicasSchema = new Schema({
 });
 
 const MultimediaSchema = new Schema({
-  urlMultimedia  : { type: String, unique: true },
-  tipoMultimedia : String,
+  urlMultimedia       : { type: String, unique: true, required: true },
+  extensionMultimedia : { type: String, required: true },
 });
 const DatosPrincipalesSchema = new Schema({
-  titulo             : { type: String },
-  descripcion        : { type: String },
-  tipo_inmueble      : { type: Number },
-  antiguedad         : { type: String },
-  dormitorios        : { type: Number },
-  estacionamientos   : { type: Number },
-  bathrooms          : { type: Number },
-  precio_soles       : { type: Number },
-  precio_dolares     : { type: Number },
-  metros_construidos : { type: Number },
-  metros_totales     : { type: Number },
-  direccion          : { type: String },
-  codigo_postal      : { type: String },
-  latitud            : { type: Number },
-  longitud           : { type: Number },
+  titulo             : { type: String, required: true },
+  descripcion        : { type: String, required: true },
+  tipo_inmueble      : { type: Number, required: true },
+  antiguedad         : { type: String, required: true },
+  dormitorios        : { type: Number, required: true },
+  estacionamientos   : { type: Number, required: true },
+  bathrooms          : { type: Number, required: true },
+  precio_soles       : { type: Number, required: true },
+  precio_dolares     : { type: Number, required: true },
+  metros_construidos : { type: Number, required: true },
+  metros_totales     : { type: Number, required: true },
+  direccion          : { type: String, required: true },
+  codigo_postal      : { type: String, required: true },
+  latitud            : { type: Number, required: true },
+  longitud           : { type: Number, required: true },
 });
 
 const inmuebleSchema = new Schema({
   datosPrincipales : DatosPrincipalesSchema,
   caracteristicas  : CaracteristicasSchema,
   multimedia       : [MultimediaSchema],
+  userCreator      : { type: ObjectId, required: true },
 }, { timestamps: true });
 
-const inmueble = model('Inmueble', inmuebleSchema);
+const Inmueble         = model('Inmueble', inmuebleSchema);
+const Caracteristicas  = model('Caracteristicas', CaracteristicasSchema);
+const Multimedia       = model('Multimedia', MultimediaSchema);
+const DatosPrincipales = model('DatosPrincipales', DatosPrincipalesSchema);
 
-module.exports = inmueble;
+exports.Caracteristicas = Caracteristicas;
+exports.Multimedia = Multimedia;
+exports.DatosPrincipales = DatosPrincipales;
+exports.Inmueble = Inmueble;
