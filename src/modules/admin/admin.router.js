@@ -19,6 +19,7 @@ router.use((req, res, next) => {
 
 router
   .post('/uploadFile', adminController.uploadFile)
-  .post('/create-inmueble', passport.authenticate('jwt', { session: false }), createInmuebleValidator, adminController.createInmueble);
-
+  .post('/create-inmueble', passport.authenticate('jwt', { session: false }), createInmuebleValidator, adminController.createInmueble)
+  .get('/get-inmuebles', passport.authenticate('jwt', { session: false }), adminController.getInmuebles)
+  .get('/get-inmueble', passport.authenticate('jwt', { session: false }), adminController.getInmueble);
 module.exports = router;
