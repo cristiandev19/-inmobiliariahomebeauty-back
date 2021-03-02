@@ -33,7 +33,7 @@ const inmuebleSchema = new Schema({
   datosPrincipales : DatosPrincipalesSchema,
   caracteristicas  : CaracteristicasSchema,
   multimedia       : [MultimediaSchema],
-  userCreator      : { type: ObjectId, required: true },
+  registerUser     : { type: ObjectId, required: true },
 }, { timestamps: true });
 
 const Inmueble         = model('Inmueble', inmuebleSchema);
