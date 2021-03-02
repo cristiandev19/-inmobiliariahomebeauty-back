@@ -19,7 +19,8 @@ module.exports = {
         on          : 'colon',
       },
     }],
-    'consistent-return': ['off'],
+    'consistent-return'    : ['off'],
+    'no-underscore-dangle' : ['off'],
     // no-multi-spaces: 'error'
     // '
   },
