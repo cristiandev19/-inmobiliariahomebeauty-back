@@ -1,5 +1,6 @@
 const authUtils = require('./auth.utils');
 const User = require('../../models/User');
+const userService = require('../../services/user');
 // const
 
 exports.emailLogin = async (req, res, next) => {
@@ -7,18 +8,12 @@ exports.emailLogin = async (req, res, next) => {
     const { email, password } = req.body;
     const [user] = await User.find({ email });
 
-    if (!user) {
-      throw new Error('El usuario no existe');
-    }
+    if (!user) throw new Error('El usuario no existe');
 
     const { error, isMatch, message } = await user.comparePassword(password);
 
-    if (error) {
-      throw new Error(message);
-    }
-    if (!isMatch) {
-      throw new Error(message);
-    }
+    if (error) throw new Error(message);
+    if (!isMatch) throw new Error(message);
 
     const tokenObject = authUtils.signToken(user);
     const { profile } = user;
@@ -46,11 +41,15 @@ exports.emailSignup = (req, res, next) => {
       names,
       lastNames,
     };
-    const user = new User({ email, password, profile });
+    const {
+      user, message, success, error,
+    } = userService.createUser({ email, password, profile });
+    if (error) throw new Error(message);
 
-    user.save();
     return res.status(200).send({
       message: 'Funciono',
+      success,
+      user,
     });
   } catch (error) {
     return next(error);
