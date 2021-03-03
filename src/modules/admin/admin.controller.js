@@ -43,11 +43,14 @@ exports.uploadFile = async (req, res, next) => {
 
 exports.createInmueble = async (req, res, next) => {
   try {
+    console.log('req.body.datosPrincipales', req.body.datosPrincipales)
+    const multimediaToUpload = [...req.body.multimedia]
+      .filter((m) => m.isBase64);
     const multimediaPromises = await Promise.all(
-      [...req.body.multimedia]
+      [...multimediaToUpload]
         .map(async (multi) => imagesUtilities.uploadBase64ToS3(multi.imgBase64)),
     );
-    const multimedia = multimediaPromises.map((m) => ({
+    const multimediaUploaded = multimediaPromises.map((m) => ({
       urlMultimedia       : m.url,
       extensionMultimedia : m.extension,
     }));
@@ -58,7 +61,71 @@ exports.createInmueble = async (req, res, next) => {
       datosPrincipales : req.body.datosPrincipales,
       caracteristicas  : req.body.caracteristicas,
       registerUser     : req.user._id,
-      multimedia,
+      multimedia       : multimediaUploaded,
+    });
+
+    if (error) {
+      throw new Error(message);
+    }
+
+    return res.status(200).send({
+      success,
+      inmueble,
+    });
+  } catch (error) {
+    return next(error);
+  }
+};
+
+exports.updateInmueble = async (req, res, next) => {
+  try {
+    const {
+      datosPrincipales,
+      caracteristicas,
+      inmuebleID,
+      multimedia: multimediaRaw,
+    } = req.body;
+    const { _id: registerUser } = req.user;
+
+    const multimediaToUpload = [...multimediaRaw]
+      .filter((m) => m.isBase64);
+    const multimediaToDelete = [...multimediaRaw]
+      .filter((m) => m.isDeleted)
+      .map((m) => ({
+        Key: m.imgUrl.split('/').slice(-1).pop(),
+      }));
+    const multimediaAlreadyUploaded = [...multimediaRaw]
+      .filter((m) => !m.isDeleted && !m.isBase64)
+      .map((m) => ({
+        urlMultimedia       : m.imgUrl,
+        extensionMultimedia : m.imgUrl.split('.').slice(-1).pop(),
+      }));
+
+    const multimediaPromises = await Promise.all(
+      [...multimediaToUpload]
+        .map(async (multi) => imagesUtilities.uploadBase64ToS3(multi.imgBase64)),
+    );
+    const multimediaUploaded = multimediaPromises.map((m) => ({
+      urlMultimedia       : m.url,
+      extensionMultimedia : m.extension,
+    }));
+    console.log('multimediaToDelete', multimediaToDelete);
+    const multimediaDeleted = await awsUtilities.s3DeleteObjectsPromise({
+      arrayKeys: multimediaToDelete,
+    });
+    console.log('multimediaDeleted', multimediaDeleted);
+
+    const multimediaOnCloud = [...multimediaAlreadyUploaded, ...multimediaUploaded];
+    console.log('multimediaOnCloud', multimediaOnCloud);
+
+    const {
+      success, error, message, inmueble,
+    } = await inmuebleService.updateInmueble({
+      multimedia : multimediaOnCloud,
+      idInmueble : inmuebleID,
+      datosPrincipales,
+      caracteristicas,
+      registerUser,
     });
 
     if (error) {
@@ -110,3 +177,27 @@ exports.getInmueble = async (req, res, next) => {
     return next(error);
   }
 };
+
+exports.testing = async (req, res, next) => {
+  try {
+    // const multimediaDeleted = await awsUtilities.s3DeleteObjectPromise({
+    //   key: '0b6074a3db3544303451dc49442f624501815685.png',
+    // });
+    // console.log('multimediaDeleted', multimediaDeleted);
+    // const multimediaDeleted = await awsUtilities.s3DeleteObjectsPromise({
+    //   arrayKeys: [
+    //     { Key: '389602e3dff2e4f0b86f872fc763b67b6f522373.png' },
+    //     { Key: '3309ea7881166d257c885e3f04a16ad8ee925806.png' },
+    //     { Key: '2945da4b7eedd72fbafefae258e9bc8a66ec1f1d.png' },
+    //   ],
+    // });
+    // console.log('multimediaDeleted', multimediaDeleted);
+    return res.status(200).send({
+      success: true,
+    });
+  } catch (error) {
+    return res.status(400).send({
+      success: false,
+    });
+  }
+}
