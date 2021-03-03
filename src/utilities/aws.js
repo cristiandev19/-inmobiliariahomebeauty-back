@@ -40,4 +40,72 @@ exports.s3UploadPromise = async ({
         */
     }
   });
-})
+});
+
+exports.s3DeleteObjectPromise = async ({ key }) => new Promise((resolve) => {
+  // call S3 to retrieve upload file to specified bucket
+  const deleteParams = {
+    Bucket : config.awsS3BucketName,
+    Key    : key,
+  };
+
+  // Set the region
+  AWS.config.update({ region: config.awsS3Region });
+
+  const s3 = new AWS.S3();
+  // call S3 to retrieve upload file to specified bucket
+  // eslint-disable-next-line consistent-return
+  s3.deleteObject(deleteParams, (err, data) => {
+    if (err) {
+      return resolve({ error: err });
+    }
+    if (data) {
+      return resolve({ ...data });
+      /**
+       * Devuelve un objeto vacio {}
+      */
+    }
+  });
+});
+
+exports.s3DeleteObjectsPromise = async ({ arrayKeys }) => new Promise((resolve) => {
+  /** arrayKeys model
+  [
+    {Key: 'a.txt'},
+    {Key: 'b.txt'},
+    {Key: 'c.txt'}
+  ]
+  * */
+  // call S3 to retrieve upload file to specified bucket
+  const deleteParams = {
+    Bucket : config.awsS3BucketName,
+    Delete : {
+      Objects: [...arrayKeys],
+    },
+  };
+
+  // Set the region
+  AWS.config.update({ region: config.awsS3Region });
+
+  const s3 = new AWS.S3();
+  // call S3 to retrieve upload file to specified bucket
+  // eslint-disable-next-line consistent-return
+  s3.deleteObjects(deleteParams, (err, data) => {
+    if (err) {
+      return resolve({ error: err });
+    }
+    if (data) {
+      return resolve({ ...data });
+      /** *
+      {
+        Deleted: [
+          { Key: '389602e3dff2e4f0b86f872fc763b67b6f522373.png' },
+          { Key: '2945da4b7eedd72fbafefae258e9bc8a66ec1f1d.png' },
+          { Key: '3309ea7881166d257c885e3f04a16ad8ee925806.png' }
+        ],
+        Errors: []
+      }
+      */
+    }
+  });
+});
