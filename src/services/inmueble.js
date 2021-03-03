@@ -1,3 +1,4 @@
+/* eslint-disable no-param-reassign */
 const { Inmueble } = require('../models/Inmueble');
 const Validator = require('../helpers/dao/Validator');
 
@@ -72,9 +73,33 @@ exports.readInmueble = (_id) => new Promise((resolve) => {
   }
 });
 
-exports.updateInmueble = () => {
-
-};
+exports.updateInmueble = ({
+  idInmueble,
+  datosPrincipales,
+  caracteristicas,
+  multimedia,
+  registerUser,
+}) => new Promise((resolve) => {
+  try {
+    Inmueble.findOneAndUpdate({
+      _id: idInmueble,
+    }, {
+      $set: {
+        datosPrincipales,
+        caracteristicas,
+        multimedia,
+        registerUser,
+      },
+    }, { upsert: true }, (err, inmueble) => {
+      if (err) {
+        return resolve({ error: err });
+      }
+      return resolve({ success: true, inmueble });
+    });
+  } catch (error) {
+    return resolve({ error });
+  }
+});
 
 exports.deleteInmueble = () => {
 
