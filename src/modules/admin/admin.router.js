@@ -6,7 +6,7 @@ const router = express.Router();
 
 const adminController = require('./admin.controller');
 
-const { createInmuebleValidator } = require('../../middlewares/inmuebleValidator');
+const { createInmuebleValidator, updateInmuebleValidator } = require('../../middlewares/inmuebleValidator');
 
 // middleware that is specific to this router
 router.use((req, res, next) => {
@@ -20,6 +20,8 @@ router.use((req, res, next) => {
 router
   .post('/uploadFile', adminController.uploadFile)
   .post('/create-inmueble', passport.authenticate('jwt', { session: false }), createInmuebleValidator, adminController.createInmueble)
+  .post('/update-inmueble', passport.authenticate('jwt', { session: false }), updateInmuebleValidator, adminController.updateInmueble)
   .get('/get-inmuebles', passport.authenticate('jwt', { session: false }), adminController.getInmuebles)
-  .get('/get-inmueble', passport.authenticate('jwt', { session: false }), adminController.getInmueble);
+  .get('/get-inmueble', passport.authenticate('jwt', { session: false }), adminController.getInmueble)
+  .get('/testing', adminController.testing);
 module.exports = router;
