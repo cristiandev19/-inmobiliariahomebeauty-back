@@ -21,6 +21,7 @@ const DatosPrincipalesSchema = new Schema({
   bathrooms          : { type: Number, required: true },
   precio_soles       : { type: Number, required: true },
   precio_dolares     : { type: Number, required: true },
+  tipo_anuncio       : { type: Number, required: true },
   metros_construidos : { type: Number, required: true },
   metros_totales     : { type: Number, required: true },
   direccion          : { type: String, required: true },
