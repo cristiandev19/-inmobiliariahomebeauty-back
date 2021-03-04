@@ -105,15 +105,18 @@ exports.updateInmueble = async (req, res, next) => {
       [...multimediaToUpload]
         .map(async (multi) => imagesUtilities.uploadBase64ToS3(multi.imgBase64)),
     );
+    console.log('multimediaPromises', multimediaPromises);
     const multimediaUploaded = multimediaPromises.map((m) => ({
       urlMultimedia       : m.url,
       extensionMultimedia : m.extension,
     }));
     console.log('multimediaToDelete', multimediaToDelete);
-    const multimediaDeleted = await awsUtilities.s3DeleteObjectsPromise({
-      arrayKeys: multimediaToDelete,
-    });
-    console.log('multimediaDeleted', multimediaDeleted);
+    if (multimediaToDelete.length > 0) {
+      const multimediaDeleted = await awsUtilities.s3DeleteObjectsPromise({
+        arrayKeys: multimediaToDelete,
+      });
+      console.log('multimediaDeleted', multimediaDeleted);
+    }
 
     const multimediaOnCloud = [...multimediaAlreadyUploaded, ...multimediaUploaded];
     console.log('multimediaOnCloud', multimediaOnCloud);
