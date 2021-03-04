@@ -30,10 +30,12 @@ app
 const adminRouter = require('./src/modules/admin/admin.router');
 const authRouter  = require('./src/modules/auth/auth.router');
 const utilityRouter  = require('./src/modules/utility/utility.router');
+const generalRouter  = require('./src/modules/general/general.router');
 
 // Establecemos las rutas
 app
   .use('/admin', adminRouter)
+  .use('/general', generalRouter)
   .use('/utility', utilityRouter)
   .use('/auth', authRouter);
 
