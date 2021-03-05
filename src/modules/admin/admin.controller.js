@@ -3,6 +3,7 @@ const imagesUtilities = require('../../utilities/images');
 const qrUtilities = require('../../utilities/qr');
 const awsUtilities = require('../../utilities/aws');
 const inmuebleService = require('../../services/inmueble');
+const { s3Folder } = require('../../config/constants');
 
 exports.uploadFile = async (req, res, next) => {
   try {
@@ -43,12 +44,11 @@ exports.uploadFile = async (req, res, next) => {
 
 exports.createInmueble = async (req, res, next) => {
   try {
-    console.log('req.body.datosPrincipales', req.body.datosPrincipales)
     const multimediaToUpload = [...req.body.multimedia]
       .filter((m) => m.isBase64);
     const multimediaPromises = await Promise.all(
       [...multimediaToUpload]
-        .map(async (multi) => imagesUtilities.uploadBase64ToS3(multi.imgBase64)),
+        .map(async (multi) => imagesUtilities.uploadBase64ToS3(multi.imgBase64, '', s3Folder.inmueblePath)),
     );
     const multimediaUploaded = multimediaPromises.map((m) => ({
       urlMultimedia       : m.url,
@@ -105,21 +105,20 @@ exports.updateInmueble = async (req, res, next) => {
       [...multimediaToUpload]
         .map(async (multi) => imagesUtilities.uploadBase64ToS3(multi.imgBase64)),
     );
-    console.log('multimediaPromises', multimediaPromises);
     const multimediaUploaded = multimediaPromises.map((m) => ({
       urlMultimedia       : m.url,
       extensionMultimedia : m.extension,
     }));
-    console.log('multimediaToDelete', multimediaToDelete);
     if (multimediaToDelete.length > 0) {
       const multimediaDeleted = await awsUtilities.s3DeleteObjectsPromise({
         arrayKeys: multimediaToDelete,
       });
-      console.log('multimediaDeleted', multimediaDeleted);
+      if (multimediaDeleted.error) {
+        throw new Error('Problemas con subir la foto');
+      }
     }
 
     const multimediaOnCloud = [...multimediaAlreadyUploaded, ...multimediaUploaded];
-    console.log('multimediaOnCloud', multimediaOnCloud);
 
     const {
       success, error, message, inmueble,
@@ -181,12 +180,11 @@ exports.getInmueble = async (req, res, next) => {
   }
 };
 
-exports.testing = async (req, res, next) => {
+exports.testing = async (req, res) => {
   try {
     // const multimediaDeleted = await awsUtilities.s3DeleteObjectPromise({
     //   key: '0b6074a3db3544303451dc49442f624501815685.png',
     // });
-    // console.log('multimediaDeleted', multimediaDeleted);
     // const multimediaDeleted = await awsUtilities.s3DeleteObjectsPromise({
     //   arrayKeys: [
     //     { Key: '389602e3dff2e4f0b86f872fc763b67b6f522373.png' },
@@ -194,7 +192,6 @@ exports.testing = async (req, res, next) => {
     //     { Key: '2945da4b7eedd72fbafefae258e9bc8a66ec1f1d.png' },
     //   ],
     // });
-    // console.log('multimediaDeleted', multimediaDeleted);
     return res.status(200).send({
       success: true,
     });
@@ -203,4 +200,4 @@ exports.testing = async (req, res, next) => {
       success: false,
     });
   }
-}
+};
