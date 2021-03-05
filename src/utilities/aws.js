@@ -2,13 +2,13 @@ const AWS = require('aws-sdk');
 const { config } = require('../config/index');
 
 exports.s3UploadPromise = async ({
-  fileName, extension, bufferBody, contentType,
+  folderPath = '', fileName, extension, bufferBody, contentType,
 }) => new Promise((resolve) => {
   // call S3 to retrieve upload file to specified bucket
   const uploadParams = {
     Bucket          : config.awsS3BucketName,
     ACL             : 'public-read', // para poder ser leido publicamente,
-    Key             : `${fileName}.${extension}`,
+    Key             : `${folderPath}${fileName}.${extension}`,
     Body            : bufferBody,
     StorageClass    : 'REDUCED_REDUNDANCY', // para poder ser leido publicamente
     ContentType     : contentType,
