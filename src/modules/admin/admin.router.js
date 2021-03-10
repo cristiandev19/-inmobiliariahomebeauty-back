@@ -23,5 +23,6 @@ router
   .post('/update-inmueble', passport.authenticate('jwt', { session: false }), updateInmuebleValidator, adminController.updateInmueble)
   .get('/get-inmuebles', passport.authenticate('jwt', { session: false }), adminController.getInmuebles)
   .get('/get-inmueble', passport.authenticate('jwt', { session: false }), adminController.getInmueble)
+  .delete('/delete-inmueble/:inmuebleID', passport.authenticate('jwt', { session: false }), adminController.deleteInmueble)
   .get('/testing', adminController.testing);
 module.exports = router;
