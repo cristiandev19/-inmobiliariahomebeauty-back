@@ -71,6 +71,7 @@ exports.createInmueble = async (req, res, next) => {
     return res.status(200).send({
       success,
       inmueble,
+      message: 'Se agrego el inmueble exitosamente',
     });
   } catch (error) {
     return next(error);
@@ -174,6 +175,18 @@ exports.getInmueble = async (req, res, next) => {
     return res.status(200).send({
       success,
       inmueble: inmuebles[0],
+    });
+  } catch (error) {
+    return next(error);
+  }
+};
+
+exports.deleteInmueble = async (req, res, next) => {
+  try {
+    const { inmuebleID } = req.params;
+    console.log('inmuebleID', inmuebleID);
+    return res.status(200).send({
+      success: true,
     });
   } catch (error) {
     return next(error);
